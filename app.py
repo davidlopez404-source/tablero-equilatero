@@ -338,9 +338,14 @@ if runway_final != float('inf') and runway_final < 6 and break_even_month is Non
 # 3. GRÁFICO: EL VALLEY OF DEATH
 fig = go.Figure()
 
+# Parche: Convertir datos a lista nativa para que Plotly no explote
+meses_lista = df['Mes'].astype(float).tolist()
+costos_lista = df['Costos Totales'].astype(float).tolist()
+mrr_lista = df['MRR'].astype(float).tolist()
+
 # Línea de Costos (Roja)
 fig.add_trace(go.Scatter(
-    x=df['Mes'], y=df['Costos Totales'],
+    x=meses_lista, y=costos_lista,
     mode='lines',
     line=dict(color='#FF3366', width=3),
     name='Costos Totales'
@@ -348,18 +353,13 @@ fig.add_trace(go.Scatter(
 
 # Línea de MRR (Verde Neón)
 fig.add_trace(go.Scatter(
-    x=df['Mes'], y=df['MRR'],
+    x=meses_lista, y=mrr_lista,
     mode='lines',
     line=dict(color='#00FFCC', width=3),
     name='Ingresos (MRR)',
-    fill='tonexty', # Sombrear área entre líneas
-    fillcolor='rgba(255, 51, 102, 0.2)' # Color de Valley of death (rojo transparente)
+    fill='tonexty', 
+    fillcolor='rgba(255, 51, 102, 0.2)'
 ))
-
-# Ocultar fill donde MRR > Costos (Truco: trazar un área base o usar fill condicional no es directo en Scatter,
-# pero en Plotly tonexty rellena hasta la traza anterior. Si la curva verde supera a la roja, el fill
-# será del color definido. Lo ideal para aislar el Valley of Death:
-# Lo manejamos trazando una línea cero, etc., pero para este MVP dejamos el sombreado de cruce estándar.
 
 fig.update_layout(
     title='Proyección de Viabilidad: Valley of Death',
